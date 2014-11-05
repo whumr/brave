@@ -72,7 +72,7 @@ void Npc::walkTo(Vec2 dest)
 {
 	this->stopAllActions();
 	auto move = MoveTo::create((dest - this->getPosition()).getLength() / _speed, dest);
-	auto seq = Sequence::create(move, CallFunc::create([&]{this->stop();}), nullptr);
+	auto seq = Sequence::create(move, CallFunc::create([&]{this->checkTarget();}), NULL);
 	this->playAnimationForever(WALKING);
 	this->runAction(seq);
 }
@@ -82,8 +82,71 @@ void Npc::idle(){}
 void Npc::attack()
 {
 	this->stopAllActions();
-	this->playAnimationForever(ATTACKING);
+	auto animate = this->getAnimateByType(ATTACKING);
+	auto attackCallback = CallFunc::create([&]{
+		auto target = this->checkTarget();
+		if (target)
+			target->beAttacked(this);
+		this->checkTarget();
+	});
+	auto attack = Sequence::create(animate, attackCallback, NULL);
+	this->runAction(attack);
 }
 
-void Npc::die(){}
+void Npc::addTarget(Npc* target)
+{
+	if (this->_targets.empty() || !this->_targets.contains(target))
+		this->_targets.pushBack(target);
+}
+
+void Npc::removeTarget(Npc* target)
+{
+	if (!this->_targets.empty() && this->_targets.contains(target))
+		this->_targets.eraseObject(target);
+}
+
+Npc* Npc::checkTarget()
+{
+	if (!this->_targets.empty())
+	{
+		Npc* target = this->_targets.front();
+		if (target)
+		{
+			this->attack();
+			return target;
+		}
+		else
+			this->stop();
+	}
+	else
+		this->stop();
+	return NULL;
+}
+
+void Npc::beAttacked(Npc* empty)
+{
+	this->_hp = this->_hp - empty->_damage;
+	if (this->_hp <= 0)
+	{
+		this->die();
+		empty->removeTarget(this);
+	}
+}
+
+void Npc::die()
+{
+	this->stopAllActions();
+	auto die = this->getAnimateByType(DEAD);	
+	if (this->_type != PLAYER)
+	{
+		auto blink = Blink::create(1.5, 3);
+		auto callback = CallFunc::create([&]{
+			this->stopAllActions();
+			this->getParent()->removeChild(this);
+		});
+		this->runAction(Sequence::create(die, blink, callback, NULL));
+	}
+	else
+		this->runAction(die);
+}
 bool Npc::onTouch(Touch* touch, Event* event){return true;}

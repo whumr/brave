@@ -107,24 +107,45 @@ bool MainLayer::onContactBegin(const PhysicsContact& contact)
 	auto npc_a = (Npc*)contact.getShapeA()->getBody()->getNode(); 
 	auto npc_b = (Npc*)contact.getShapeB()->getBody()->getNode();
 	Player* player = NULL;
-	Monster* empty = NULL;
+	Npc* empty = NULL;
 	if (npc_a->getType() == Npc::NpcType::PLAYER)
 	{
 		player = dynamic_cast<Player*>(npc_a);
-		empty = dynamic_cast<Monster*>(npc_b);
+		empty = dynamic_cast<Npc*>(npc_b);
 	}
 	else if (npc_b->getType() == Npc::NpcType::PLAYER)
 	{
 		player = dynamic_cast<Player*>(npc_b);
-		empty = dynamic_cast<Monster*>(npc_a);
+		empty = dynamic_cast<Npc*>(npc_a);
 	}
 	if (player) 
 	{
-		player->attack();
+		player->addTarget(empty);
+		player->checkTarget();
 	}
 	return true;
 }
 
 void MainLayer::onContactSeperate(const PhysicsContact& contact)
 {
+	CCLOG("MainLayer::onContactSeperate");
+	auto npc_a = (Npc*)contact.getShapeA()->getBody()->getNode(); 
+	auto npc_b = (Npc*)contact.getShapeB()->getBody()->getNode();
+	Player* player = NULL;
+	Npc* empty = NULL;
+	if (npc_a->getType() == Npc::NpcType::PLAYER)
+	{
+		player = dynamic_cast<Player*>(npc_a);
+		empty = dynamic_cast<Npc*>(npc_b);
+	}
+	else if (npc_b->getType() == Npc::NpcType::PLAYER)
+	{
+		player = dynamic_cast<Player*>(npc_b);
+		empty = dynamic_cast<Npc*>(npc_a);
+	}
+	if (player) 
+	{
+		player->removeTarget(empty);
+		//player->attack();
+	}
 }

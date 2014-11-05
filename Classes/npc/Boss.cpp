@@ -11,6 +11,7 @@ bool Boss::init()
 	_speed = 100;
 	_hp = 100;
 	_maxHp =100;
+	_damage = 30;
 
 	_animationNum = 4;
 	int animationFrameNum[5] ={1, 5, 4, 2, 0};

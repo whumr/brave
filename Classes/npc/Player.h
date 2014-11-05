@@ -13,6 +13,8 @@ public:
 	bool init();
 	bool onTouch(Touch* touch, Event* event);
 
+	//void attack();
+
 	CREATE_FUNC(Player);
 };
 #endif

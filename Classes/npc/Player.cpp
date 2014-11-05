@@ -11,6 +11,7 @@ bool Player::init()
 	_speed = 100;
 	_hp = 100;
 	_maxHp =100;
+	_damage = 20;
 
 	_animationNum = 5;
 	int animationFrameNum[5] ={4, 4, 4, 2, 4};
@@ -41,3 +42,13 @@ bool Player::onTouch(Touch* touch, Event* event)
 {
 	return true;
 }
+
+//void Player::attack()
+//{
+//	this->stopAllActions();
+//	this->playAnimationForever(ATTACKING);
+//
+//	Npc* target = this->_targets.front();
+//	if (target)
+//		target->beAttacked(this);
+//}

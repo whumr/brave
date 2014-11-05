@@ -39,6 +39,7 @@ bool Monster::init()
 	_speed = 80;
 	_hp = 100;
 	_maxHp =100;
+	_damage = 20;
 
 	_animationNum = 5;
 	int animationFrameNum[5] ={3, 3, 3, 2, 0};

@@ -36,14 +36,21 @@ public:
 	void playAnimationForever(AnimationType type);
 	void stop();
 
-	virtual void walkTo(Vec2 dest);
-	virtual void idle();	
-	virtual void attack();
-	virtual void die();
+	void walkTo(Vec2 dest);
+	void idle();	
+	void attack();
+	void die();
+
+	void addTarget(Npc* target);
+	void removeTarget(Npc* target);
+	void beAttacked(Npc* empty);
+	Npc* checkTarget();
+
 	virtual bool onTouch(Touch* touch, Event* event);
 
 	CC_SYNTHESIZE(int, _hp, Hp);
 	CC_SYNTHESIZE(int, _maxHp, MaxHp);
+	CC_SYNTHESIZE(int, _damage, Damage);
 	CC_SYNTHESIZE(NpcType, _type, Type);
 
 protected:
@@ -52,7 +59,7 @@ protected:
 	std::vector<int> _animationFrameNum;
 	std::vector<std::string> _animationNames;
 	float _speed;
-	Vector<Npc>* _targets;
+	Vector<Npc*> _targets;
 };
 
 #endif
