@@ -36,10 +36,13 @@ bool Monster::init()
 	default:
 		return false;
 	}
-	_speed = 80;
+	_initFrame = sfName;
+	_speed = 50;
 	_hp = 100;
 	_maxHp =100;
-	_damage = 20;
+	_damage = 15;
+	_alarmRange = 300;
+	_attackDelay = 1;
 
 	_animationNum = 5;
 	int animationFrameNum[5] ={3, 3, 3, 2, 0};
@@ -61,6 +64,8 @@ bool Monster::init()
 	body->setCollisionBitmask(ColliderType::ColliderTypeNone);
 	body->setContactTestBitmask(ColliderType::ColliderTypePlayer);
 	this->setPhysicsBody(body); 
+
+	this->showProgress();
 
 //	_listener = EventListenerTouchOneByOne::create();
 //	_listener->setSwallowTouches(true);

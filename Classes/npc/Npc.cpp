@@ -1,7 +1,24 @@
 #include "npc/Npc.h"
+#include "util/RectUtil.h"
 
 Npc::Npc(){}
 Npc::~Npc(){}
+
+void Npc::showProgress()
+{
+	if (_type == PLAYER)
+	{
+		_progress = Progress::create("player-progress-bg.png","player-progress-fill.png");
+		_progress->setPosition(RectUtil::left().x + _progress->getContentSize().width/2, RectUtil::top().y - _progress->getContentSize().height/2);
+		this->getParent()->addChild(_progress);
+	}
+	else
+	{
+		_progress = Progress::create("small-enemy-progress-bg.png","small-enemy-progress-fill.png");
+		_progress->setPosition(200 , 200);
+		this->addChild(_progress);
+	}	
+}
 
 void Npc::addAnimation()
 {
@@ -71,8 +88,18 @@ void Npc::stop()
 void Npc::walkTo(Vec2 dest)
 {
 	this->stopAllActions();
-	auto move = MoveTo::create((dest - this->getPosition()).getLength() / _speed, dest);
-	auto seq = Sequence::create(move, CallFunc::create([&]{this->checkTarget();}), NULL);
+	auto position = this->getPosition();
+	auto move = MoveTo::create(dest.getDistance(position) / _speed, dest);
+	auto seq = Sequence::create(move, CallFunc::create([&]{
+		auto target = this->getTarget();
+		if (target)
+			target->beAttacked(this);
+		this->checkTarget();
+	}), NULL);
+	if (position.x > dest.x)
+		this->setFlippedX(_type == PLAYER);
+	else
+		this->setFlippedX(_type != PLAYER);
 	this->playAnimationForever(WALKING);
 	this->runAction(seq);
 }
@@ -81,15 +108,19 @@ void Npc::idle(){}
 
 void Npc::attack()
 {
-	this->stopAllActions();
 	auto animate = this->getAnimateByType(ATTACKING);
+	auto attackCheck = CallFunc::create([&]{
+		auto target = this->getTarget();
+		if (!target)
+			this->stop();
+	});
 	auto attackCallback = CallFunc::create([&]{
-		auto target = this->checkTarget();
+		auto target = this->getTarget();
 		if (target)
 			target->beAttacked(this);
 		this->checkTarget();
 	});
-	auto attack = Sequence::create(animate, attackCallback, NULL);
+	auto attack = Sequence::create(DelayTime::create(this->getAttackDelay()), animate, attackCallback, NULL);
 	this->runAction(attack);
 }
 
@@ -105,21 +136,22 @@ void Npc::removeTarget(Npc* target)
 		this->_targets.eraseObject(target);
 }
 
-Npc* Npc::checkTarget()
+void Npc::checkTarget()
+{
+	this->stop();
+	auto target = this->getTarget();
+	if (target)
+		this->attack();
+}
+
+Npc* Npc::getTarget()
 {
 	if (!this->_targets.empty())
 	{
 		Npc* target = this->_targets.front();
 		if (target)
-		{
-			this->attack();
 			return target;
-		}
-		else
-			this->stop();
 	}
-	else
-		this->stop();
 	return NULL;
 }
 
@@ -128,8 +160,13 @@ void Npc::beAttacked(Npc* empty)
 	this->_hp = this->_hp - empty->_damage;
 	if (this->_hp <= 0)
 	{
+		this->_progress->setProgress(0);
 		this->die();
 		empty->removeTarget(this);
+	}
+	else
+	{
+		this->_progress->setProgress((float)_hp/_maxHp*100);
 	}
 }
 
@@ -142,7 +179,8 @@ void Npc::die()
 		auto blink = Blink::create(1.5, 3);
 		auto callback = CallFunc::create([&]{
 			this->stopAllActions();
-			this->getParent()->removeChild(this);
+			this->setVisible(false);
+			//this->getParent()->removeChild(this, false);
 		});
 		this->runAction(Sequence::create(die, blink, callback, NULL));
 	}

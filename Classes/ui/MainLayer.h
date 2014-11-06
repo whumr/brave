@@ -4,7 +4,7 @@
 #include "cocos2d.h"
 #include "npc/Player.h"
 #include "npc/Monster.h"
-#include "ui/Progress.h"
+#include "npc/Boss.h"
 
 USING_NS_CC;
 
@@ -23,14 +23,15 @@ public:
 	void onContactSeperate(const PhysicsContact& contact);
 	void setPhysicsWorld(PhysicsWorld* physicsWorld){_world=physicsWorld;}
 
+	void enemyMove(float t);
 	CREATE_FUNC(MainLayer);
 
 private:
 	Player* _player;
 	Monster* _monster;
+	Boss* _boss;
 	EventListenerTouchOneByOne* _listener_touch;
 	EventListenerPhysicsContact* _listener_contact;
-	Progress* _progress;
 	PhysicsWorld* _world;
 };
 

@@ -13,6 +13,7 @@ bool MainLayer::init()
 	this->addUI();
 	this->addListener();
 	this->scheduleUpdate();
+	this->schedule(schedule_selector(MainLayer::enemyMove), 0.5);
 	return true;
 }
 
@@ -47,22 +48,19 @@ void MainLayer::addRoles()
 	_player = Player::create();
 	_player->setPosition(RectUtil::left().x + _player->getContentSize().width/2, RectUtil::top().y/2);
 	this->addChild(_player);
+	_player->showProgress();
 	
 	_monster = Monster::create(Monster::NpcType::MONSTER1);
 	_monster->setPosition(RectUtil::center().x - _monster->getContentSize().width/2, RectUtil::center().y/2);
 	this->addChild(_monster);
 
-	auto boss = Boss::create();
-	boss->setPosition(RectUtil::center().x - boss->getContentSize().width, RectUtil::center().y/2);
-	this->addChild(boss);
+	_boss = Boss::create();
+	_boss->setPosition(RectUtil::center().x - _boss->getContentSize().width, RectUtil::center().y/2);
+	this->addChild(_boss);
 }
 
 void MainLayer::addUI()
 {
-	_progress = Progress::create("player-progress-bg.png","player-progress-fill.png");
-	_progress->setPosition(RectUtil::left().x + _progress->getContentSize().width/2, RectUtil::top().y - _progress->getContentSize().height/2);
-	this->addChild(_progress);
-
 	auto pauseItem = MenuUtil::createMenuItemImage("pause1.png", "pause2.png", CC_CALLBACK_1(MainLayer::onTouchPause,this));
 	pauseItem->setTag(1);
 	pauseItem->setPosition(RectUtil::right().x - pauseItem->getContentSize().width/2, 
@@ -97,8 +95,33 @@ void MainLayer::addListener()
 }
 
 void MainLayer::update(float dt)
+{	
+}
+
+void MainLayer::enemyMove(float t)
 {
-	
+	if (this->_player != NULL && this->_player->getHp() > 0)
+	{
+		auto p_p = this->_player->getPosition();
+		if (this->_monster != NULL && this->_monster->getHp() > 0 && this->_monster->getTarget() == NULL)
+		{
+			auto m_p = this->_monster->getPosition();
+			float distance = p_p.getDistance(m_p);
+			if (distance <= this->_monster->getAlarmRange())
+				this->_monster->walkTo(p_p);
+			else
+				this->_monster->stop();
+		}
+		if (this->_boss != NULL && this->_boss->getHp() > 0 && this->_boss->getTarget() == NULL)
+		{
+			auto m_p = this->_boss->getPosition();
+			float distance = p_p.getDistance(m_p);
+			if (distance <= this->_boss->getAlarmRange())
+				this->_boss->walkTo(p_p);
+			else
+				this->_boss->stop();
+		}
+	}
 }
 
 bool MainLayer::onContactBegin(const PhysicsContact& contact)
@@ -120,8 +143,16 @@ bool MainLayer::onContactBegin(const PhysicsContact& contact)
 	}
 	if (player) 
 	{
-		player->addTarget(empty);
-		player->checkTarget();
+		if (empty->getHp() > 0)
+		{
+			player->addTarget(empty);
+			player->checkTarget();			
+		}
+		if (player->getHp() > 0)
+		{
+			empty->addTarget(player);
+			empty->checkTarget();
+		}
 	}
 	return true;
 }
@@ -146,6 +177,6 @@ void MainLayer::onContactSeperate(const PhysicsContact& contact)
 	if (player) 
 	{
 		player->removeTarget(empty);
-		//player->attack();
+		empty->removeTarget(player);
 	}
 }

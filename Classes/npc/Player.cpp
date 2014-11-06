@@ -8,10 +8,12 @@ bool Player::init()
 	_initFrame = "player1-1-1.png";
 	_name = "player1";
 	_type = NpcType::PLAYER;
-	_speed = 100;
+	_speed = 200;
 	_hp = 100;
 	_maxHp =100;
 	_damage = 20;
+	_alarmRange = 0;
+	_attackDelay = 0.5;
 
 	_animationNum = 5;
 	int animationFrameNum[5] ={4, 4, 4, 2, 4};
@@ -30,7 +32,7 @@ bool Player::init()
 	body->setCollisionBitmask(ColliderType::ColliderTypeNone);
 	body->setContactTestBitmask(ColliderType::ColliderTypeMonster | ColliderType::ColliderTypeBOSS);
 	this->setPhysicsBody(body); 
-
+	
 //	_listener = EventListenerTouchOneByOne::create();
 //	_listener->setSwallowTouches(true);
 //	_listener->onTouchBegan = CC_CALLBACK_2(Player::onTouch,this);

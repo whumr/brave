@@ -5,13 +5,15 @@ Boss::~Boss(){}
 
 bool Boss::init()
 {
-	std::string sfName = "df1-1-1.png";
+	_initFrame = "df1-1-1.png";
 	_name = "df1";
 	_type = NpcType::BOSS;
 	_speed = 100;
 	_hp = 100;
 	_maxHp =100;
-	_damage = 30;
+	_damage = 40;
+	_alarmRange = 100;
+	_attackDelay = 2;
 
 	_animationNum = 4;
 	int animationFrameNum[5] ={1, 5, 4, 2, 0};
@@ -20,7 +22,7 @@ bool Boss::init()
 	std::string animationNames[] = {"walk", "attack", "dead", "hit", "skill"};
 	_animationNames.assign(animationNames, animationNames + 5);
 
-	this->initWithSpriteFrameName(sfName);
+	this->initWithSpriteFrameName(_initFrame);
 	//load animation
 	this->addAnimation();
 
@@ -31,6 +33,7 @@ bool Boss::init()
 	body->setContactTestBitmask(ColliderType::ColliderTypePlayer);
 	this->setPhysicsBody(body); 
 
+	this->showProgress();
 //	_listener = EventListenerTouchOneByOne::create();
 //	_listener->setSwallowTouches(true);
 //	_listener->onTouchBegan = CC_CALLBACK_2(Boss::onTouch,this);
