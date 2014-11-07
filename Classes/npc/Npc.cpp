@@ -15,7 +15,7 @@ void Npc::showProgress()
 	else
 	{
 		_progress = Progress::create("small-enemy-progress-bg.png","small-enemy-progress-fill.png");
-		_progress->setPosition(200 , 200);
+		_progress->setPosition(150 , 200);
 		this->addChild(_progress);
 	}	
 }
@@ -88,6 +88,22 @@ void Npc::stop()
 void Npc::walkTo(Vec2 dest)
 {
 	this->stopAllActions();
+
+	auto left_bottom = RectUtil::leftBottom();
+	auto right_top = RectUtil::rightTop();
+	float min_x = left_bottom.x, min_y = left_bottom.y,
+		max_x = right_top.x, max_y = right_top.y,
+		x = dest.x, y = dest.y;
+	if (x < min_x)
+		x = min_x;
+	else if (x > max_x)
+		x = max_x;
+	if (y < min_y)
+		y = min_y;
+	else if (y > max_y)
+		y = max_y;
+
+	dest = Vec2(x,y);
 	auto position = this->getPosition();
 	auto move = MoveTo::create(dest.getDistance(position) / _speed, dest);
 	auto seq = Sequence::create(move, CallFunc::create([&]{
@@ -96,7 +112,7 @@ void Npc::walkTo(Vec2 dest)
 			target->beAttacked(this);
 		this->checkTarget();
 	}), NULL);
-	if (position.x > dest.x)
+	if (position.x >= dest.x && dest.x != max_x)
 		this->setFlippedX(_type == PLAYER);
 	else
 		this->setFlippedX(_type != PLAYER);
@@ -141,7 +157,15 @@ void Npc::checkTarget()
 	this->stop();
 	auto target = this->getTarget();
 	if (target)
+	{
+		auto c_p = this->getPosition();
+		auto t_p = target->getPosition();
+		if (c_p.x > t_p.x)
+			this->setFlippedX(_type == PLAYER);
+		else
+			this->setFlippedX(_type != PLAYER);	
 		this->attack();
+	}
 }
 
 Npc* Npc::getTarget()

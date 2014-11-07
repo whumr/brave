@@ -100,28 +100,28 @@ void MainLayer::update(float dt)
 
 void MainLayer::enemyMove(float t)
 {
-	if (this->_player != NULL && this->_player->getHp() > 0)
-	{
-		auto p_p = this->_player->getPosition();
-		if (this->_monster != NULL && this->_monster->getHp() > 0 && this->_monster->getTarget() == NULL)
-		{
-			auto m_p = this->_monster->getPosition();
-			float distance = p_p.getDistance(m_p);
-			if (distance <= this->_monster->getAlarmRange())
-				this->_monster->walkTo(p_p);
-			else
-				this->_monster->stop();
-		}
-		if (this->_boss != NULL && this->_boss->getHp() > 0 && this->_boss->getTarget() == NULL)
-		{
-			auto m_p = this->_boss->getPosition();
-			float distance = p_p.getDistance(m_p);
-			if (distance <= this->_boss->getAlarmRange())
-				this->_boss->walkTo(p_p);
-			else
-				this->_boss->stop();
-		}
-	}
+	//if (this->_player != NULL && this->_player->getHp() > 0)
+	//{
+	//	auto p_p = this->_player->getPosition();
+	//	if (this->_monster != NULL && this->_monster->getHp() > 0 && this->_monster->getTarget() == NULL)
+	//	{
+	//		auto m_p = this->_monster->getPosition();
+	//		float distance = p_p.getDistance(m_p);
+	//		if (distance <= this->_monster->getAlarmRange())
+	//			this->_monster->walkTo(p_p);
+	//		else
+	//			this->_monster->stop();
+	//	}
+	//	if (this->_boss != NULL && this->_boss->getHp() > 0 && this->_boss->getTarget() == NULL)
+	//	{
+	//		auto m_p = this->_boss->getPosition();
+	//		float distance = p_p.getDistance(m_p);
+	//		if (distance <= this->_boss->getAlarmRange())
+	//			this->_boss->walkTo(p_p);
+	//		else
+	//			this->_boss->stop();
+	//	}
+	//}
 }
 
 bool MainLayer::onContactBegin(const PhysicsContact& contact)
@@ -143,13 +143,10 @@ bool MainLayer::onContactBegin(const PhysicsContact& contact)
 	}
 	if (player) 
 	{
-		if (empty->getHp() > 0)
+		if (empty->getHp() > 0 && player->getHp() > 0)
 		{
 			player->addTarget(empty);
-			player->checkTarget();			
-		}
-		if (player->getHp() > 0)
-		{
+			player->checkTarget();		
 			empty->addTarget(player);
 			empty->checkTarget();
 		}

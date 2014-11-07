@@ -9,11 +9,11 @@ bool Player::init()
 	_name = "player1";
 	_type = NpcType::PLAYER;
 	_speed = 200;
-	_hp = 100;
+	_hp = 10000;
 	_maxHp =100;
 	_damage = 20;
 	_alarmRange = 0;
-	_attackDelay = 0.5;
+	_attackDelay = 0.4;
 
 	_animationNum = 5;
 	int animationFrameNum[5] ={4, 4, 4, 2, 4};
@@ -27,7 +27,7 @@ bool Player::init()
 	this->addAnimation();
 
 	//set contact
-	auto body = PhysicsBody::createBox(Size(120, 30), PHYSICSBODY_MATERIAL_DEFAULT, Vec2(-40, 10));
+	auto body = PhysicsBody::createBox(Size(120, 30));
 	body->setCategoryBitmask(ColliderType::ColliderTypePlayer);
 	body->setCollisionBitmask(ColliderType::ColliderTypeNone);
 	body->setContactTestBitmask(ColliderType::ColliderTypeMonster | ColliderType::ColliderTypeBOSS);

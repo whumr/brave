@@ -56,7 +56,7 @@ bool Monster::init()
 	this->addAnimation();
 
 	//set contact
-	auto body = PhysicsBody::createBox(Size(120, 30), PHYSICSBODY_MATERIAL_DEFAULT, Vec2(40, 0));
+	auto body = PhysicsBody::createBox(Size(120, 30));
 	//auto size = this->getContentSize();
 	//CCLOG("monster size: %f, %f ",size.width, size.height);
 	//body->addShape(PhysicsShapeBox::create(size));

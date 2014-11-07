@@ -12,8 +12,8 @@ bool Boss::init()
 	_hp = 100;
 	_maxHp =100;
 	_damage = 40;
-	_alarmRange = 100;
-	_attackDelay = 2;
+	_alarmRange = 500;
+	_attackDelay = 0.5;
 
 	_animationNum = 4;
 	int animationFrameNum[5] ={1, 5, 4, 2, 0};
@@ -27,7 +27,7 @@ bool Boss::init()
 	this->addAnimation();
 
 	//set contact
-	auto body = PhysicsBody::createBox(Size(140, 40), PHYSICSBODY_MATERIAL_DEFAULT, Vec2(40, 0));
+	auto body = PhysicsBody::createBox(Size(140, 40));
 	body->setCategoryBitmask(ColliderType::ColliderTypeMonster);
 	body->setCollisionBitmask(ColliderType::ColliderTypeNone);
 	body->setContactTestBitmask(ColliderType::ColliderTypePlayer);
